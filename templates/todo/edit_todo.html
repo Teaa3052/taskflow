@@ -1,0 +1,149 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Uredi To-Do | TaskFlow</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: url("{% static 'img/background.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .logo-header {
+      font-size: 48px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-box {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 35px 40px;
+      border-radius: 14px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 450px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="date"] {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .inline-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .inline-checkbox input[type="checkbox"] {
+      transform: scale(1.5);
+      cursor: pointer;
+    }
+
+    button {
+      background-color: #ffc107;
+      color: #222;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e0a800;
+    }
+
+    .back-link {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .back-link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-header">TaskFlow</div>
+
+  <div class="form-box">
+    <h2>Edit</h2>
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_title">Title:</label>
+        {{ form.title }}
+      </div>
+
+      <div class="form-group">
+        <div class="inline-checkbox">
+          <label for="id_completed">Completed: </label>
+          {{ form.completed }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_deadline">Deadline:</label>
+        {{ form.deadline }}
+      </div>
+
+      <button type="submit">💾 Spremi promjene</button>
+    </form>
+
+    <div class="back-link">
+      <a href="{% url 'todo_list' %}">← Povratak na listu</a>
+    </div>
+  </div>
+
+</body>
+</html>
+

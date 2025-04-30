@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TaskFlow | Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: url('/static/img/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 40px 20px 20px 20px;
+        }
+
+        .logo {
+        font-size: 84px;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 4px 4px 12px rgba(0, 0, 0, 0.6);
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+        text-align: center;
+        }
+
+        .content-box {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .login-box, .info-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 320px;
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: #333;
+            text-align: center;
+        }
+
+        .login-box form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-box label {
+            align-self: flex-start;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .login-box button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-box p {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .login-box a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .info-box h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .info-box ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        .info-box p {
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px 10px;
+            color: white;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 40px;
+                margin-bottom: 30px;
+            }
+
+            .content-box {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="logo">TaskFlow</div>
+    <div class="content-box">
+        <!-- LOGIN -->
+        <div class="login-box">
+            <h2>Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="username">Username:</label>
+                {{ form.username }}
+
+                <label for="password">Password:</label>
+                {{ form.password }}
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        </div>
+
+        <!-- INFO -->
+        <div class="info-box">
+            <h2>Što je TaskFlow?</h2>
+            <p>TaskFlow ti pomaže da:</p>
+            <ul>
+                <li>✔️ Jednostavno organiziraš svoje zadatke</li>
+                <li>✔️ Dodaješ i uređuješ to-do stavke</li>
+                <li>✔️ Održiš produktivnost svaki dan</li>
+            </ul>
+            <p>Prati svoj napredak i budi efikasniji. Sve na jednom mjestu. 👌</p>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    © 2025 TaskFlow. Sva prava pridržana.
+</footer>
+
+</body>
+</html>

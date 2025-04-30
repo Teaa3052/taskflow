@@ -1,0 +1,196 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow | To-Do List</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url("{% static 'img/background.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 60px;
+    }
+
+    .logo-header {
+      font-size: 50px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .todo-box {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .todo-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .todo-box ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .todo-box li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 16px;
+      color: #222;
+    }
+
+    .todo-box li:last-child {
+      border-bottom: none;
+    }
+
+    .todo-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .todo-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .todo-title.completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    .deadline {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .deadline.overdue {
+      color: red;
+      font-weight: bold;
+    }
+
+    .deadline.upcoming {
+      color: #888;
+    }
+
+    .todo-actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .todo-actions a {
+      text-decoration: none;
+      color: white;
+      background-color: #007bff;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .todo-actions a:hover {
+      background-color: #0056b3;
+    }
+
+    .todo-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .todo-buttons a {
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+
+    .todo-buttons .edit-btn {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .todo-buttons .edit-btn:hover {
+      background-color: #e0e0e0;
+    }
+
+    .todo-buttons .delete-btn {
+      background-color: #f8d7da;
+      color: #c82333;
+    }
+
+    .todo-buttons .delete-btn:hover {
+      background-color: #f5c6cb;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-header">TaskFlow</div>
+
+  <div class="todo-box">
+    <h2>To-Do List</h2>
+
+    <ul>
+      {% for todo in todos %}
+        <li>
+          <div class="todo-content">
+            <div class="todo-title {% if todo.completed %}completed{% endif %}">
+              <input type="checkbox" {% if todo.completed %}checked{% endif %} disabled />
+              {{ todo.title }}
+            </div>
+            {% if todo.deadline %}
+              <div class="deadline {% if todo.deadline < today %}overdue{% else %}upcoming{% endif %}">
+                ⏳ Rok: {{ todo.deadline|date:"d.m.Y" }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="todo-buttons">
+            <a href="{% url 'edit_todo' todo.pk %}" class="edit-btn">✏️ Edit</a>
+            <a href="{% url 'delete_todo' todo.pk %}" class="delete-btn" onclick="return confirm('Jesi siguran da želiš obrisati zadatak?');">🗑️ Delete</a>
+          </div>
+        </li>
+      {% empty %}
+        <li style="text-align: center;">No tasks yet. 🎉</li>
+      {% endfor %}
+    </ul>
+
+    <div class="todo-actions">
+      <a href="{% url 'add_todo' %}">➕ Add New To-Do</a>
+      <a href="{% url 'logout' %}">🚪 Logout</a>
+    </div>
+  </div>
+
+</body>
+</html>
