@@ -67,7 +67,7 @@ python manage.py runserver
 ## 🔐 Admin pristup
 
 - URL: `http://127.0.0.1:8000/admin`
-- Korisničko ime: admin
+- Korisničko ime: adminSlava
 - Lozinka: admin
 
 ## 🛡️ Sigurnost i privatnost
