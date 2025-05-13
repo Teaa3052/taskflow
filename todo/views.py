@@ -1,51 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterForm
-from .models import Todo
-from .forms import TodoForm
-from datetime import date  # 👈 Dodano
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods, require_POST
+from django.db.models import Q
+from datetime import date
 
-def custom_logout(request):
-    logout(request)
-    return redirect('login')
+from .forms import RegisterForm, TodoForm, TaskListForm
+from .models import Todo, TaskList
 
-@login_required
-def todo_list(request):
-    todos = Todo.objects.filter(user=request.user)
-    today = date.today()  # 👈 Dodano za usporedbu s rokovima
-    return render(request, 'todo/todo_list.html', {'todos': todos, 'today': today})
-
-@login_required
-def add_todo(request):
-    if request.method == 'POST':
-        form = TodoForm(request.POST)
-        if form.is_valid():
-            todo = form.save(commit=False)
-            todo.user = request.user
-            todo.save()
-            return redirect('todo_list')
-    else:
-        form = TodoForm()
-    return render(request, 'todo/add_todo.html', {'form': form})
-
-@login_required
-def edit_todo(request, pk):
-    todo = get_object_or_404(Todo, pk=pk, user=request.user)
-    if request.method == 'POST':
-        form = TodoForm(request.POST, instance=todo)
-        if form.is_valid():
-            form.save()
-            return redirect('todo_list')
-    else:
-        form = TodoForm(instance=todo)
-    return render(request, 'todo/edit_todo.html', {'form': form})
-
-@login_required
-def delete_todo(request, pk):
-    todo = get_object_or_404(Todo, pk=pk, user=request.user)
-    todo.delete()
-    return redirect('todo_list')
+# -------------------------------
+# AUTH
+# -------------------------------
 
 def register(request):
     if request.method == 'POST':
@@ -57,3 +24,119 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'registration/register.html', {'form': form})
+
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
+
+# -------------------------------
+# TODO LIST
+# -------------------------------
+
+@login_required
+def todo_list(request):
+    list_id = request.GET.get('list')
+    
+    task_lists = TaskList.objects.filter(
+        Q(user=request.user) | Q(shared_with=request.user)
+    ).distinct()
+
+    if list_id:
+        todos = Todo.objects.filter(
+            Q(list_id=list_id),
+            Q(list__user=request.user) | Q(list__shared_with=request.user)
+        ).distinct()
+    else:
+        todos = Todo.objects.filter(
+            Q(list__user=request.user) | Q(list__shared_with=request.user)
+        ).distinct()
+
+    today = date.today()
+    return render(request, 'todo/todo_list.html', {
+        'todos': todos,
+        'today': today,
+        'task_lists': task_lists,
+        'active_list_id': int(list_id) if list_id else None,
+    })
+
+@login_required
+def add_todo(request):
+    if request.method == 'POST':
+        form = TodoForm(request.POST, user=request.user)
+        if form.is_valid():
+            todo = form.save(commit=False)
+            task_list = todo.list
+            if task_list.user == request.user or request.user in task_list.shared_with.all():
+                todo.user = request.user
+                todo.save()
+                return redirect('todo_list')
+            else:
+                return redirect('todo_list')
+    else:
+        form = TodoForm(user=request.user)
+    return render(request, 'todo/add_todo.html', {'form': form})
+
+@login_required
+def edit_todo(request, pk):
+    todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = TodoForm(request.POST, instance=todo, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('todo_list')
+    else:
+        form = TodoForm(instance=todo, user=request.user)
+    return render(request, 'todo/edit_todo.html', {'form': form})
+
+@login_required
+def delete_todo(request, pk):
+    todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    todo.delete()
+    return redirect('todo_list')
+
+@require_POST
+@login_required
+def toggle_completed(request, pk):
+    todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    todo.completed = not todo.completed
+    todo.save()
+    return redirect('todo_list')
+
+# -------------------------------
+# TASK LIST (KATEGORIJE)
+# -------------------------------
+
+@login_required
+def add_list(request):
+    if request.method == 'POST':
+        form = TaskListForm(request.POST, user=request.user)
+        if form.is_valid():
+            task_list = form.save(commit=False)
+            task_list.user = request.user
+            task_list.save()
+            form.instance = task_list
+            form.save_m2m()
+            return redirect('todo_list')
+    else:
+        form = TaskListForm(user=request.user)
+    return render(request, 'todo/add_list.html', {'form': form})
+
+@login_required
+def edit_list(request, pk):
+    task_list = get_object_or_404(TaskList, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = TaskListForm(request.POST, instance=task_list, user=request.user)
+        if form.is_valid():
+            form.save()
+        return redirect('todo_list')
+    else:
+        # Ako želiš edit modal preko AJAX-a, ovo bi trebao biti JSON, ali za sada se koristi samo POST
+        return redirect('todo_list')
+
+@require_http_methods(["POST"])
+@csrf_protect
+@login_required
+def delete_list(request, list_id):
+    task_list = get_object_or_404(TaskList, id=list_id, user=request.user)
+    task_list.delete()
+    return JsonResponse({'status': 'ok'})

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Obriši Listu | TaskFlow</title>
+</head>
+<body>
+  <h2>Jesi siguran da želiš obrisati listu "{{ task_list.name }}"?</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit">Obriši</button>
+  </form>
+  <a href="{% url 'todo_list' %}">Odustani</a>
+</body>
+</html>

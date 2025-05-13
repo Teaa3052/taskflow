@@ -4,7 +4,7 @@
 <html lang="hr">
 <head>
   <meta charset="UTF-8">
-  <title>Uredi To-Do | TaskFlow</title>
+  <title>Nova Lista | TaskFlow</title>
   <style>
     body {
       margin: 0;
@@ -48,11 +48,6 @@
       gap: 20px;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-
     .form-group label {
       margin-bottom: 6px;
       font-weight: 500;
@@ -60,16 +55,26 @@
     }
 
     .form-group input[type="text"],
-    .form-group input[type="date"] {
+    .form-group select,
+    .form-group input[type="checkbox"] {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 16px;
+      width: 100%;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 120px;
+      overflow-y: auto;
     }
 
     button {
-      background-color: #ffc107;
-      color: #222;
+      background-color: #28a745;
+      color: white;
       border: none;
       padding: 12px;
       font-size: 16px;
@@ -79,7 +84,7 @@
     }
 
     button:hover {
-      background-color: #e0a800;
+      background-color: #218838;
     }
 
     .back-link {
@@ -102,25 +107,27 @@
   <div class="logo-header">TaskFlow</div>
 
   <div class="form-box">
-    <h2>Edit</h2>
-    <form method="POST">
+    <h2>Nova Lista</h2>
+    <form method="post">
       {% csrf_token %}
 
       <div class="form-group">
-        <label for="id_title">Title:</label>
-        {{ form.title }}
+        <label for="id_name">Naziv liste:</label>
+        {{ form.name }}
       </div>
 
       <div class="form-group">
-        <label for="id_deadline">Deadline:</label>
-        {{ form.deadline }}
+        <label for="id_shared_with">Podijeli s korisnicima:</label>
+        <div class="checkbox-group">
+          {{ form.shared_with }}
+        </div>
       </div>
 
-      <button type="submit">💾 Spremi promjene</button>
+      <button type="submit">➕ Dodaj listu</button>
     </form>
 
     <div class="back-link">
-      <a href="{% url 'todo_list' %}">← Povratak na listu</a>
+      <a href="{% url 'todo_list' %}">← Povratak na zadatke</a>
     </div>
   </div>
 

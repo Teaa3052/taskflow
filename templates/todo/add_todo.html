@@ -55,7 +55,8 @@
       font-size: 14px;
     }
 
-    .form-group input {
+    .form-group input,
+    .form-group select {
       width: 100%;
       padding: 10px;
       font-size: 15px;
@@ -106,6 +107,16 @@
       <div class="form-group">
         <label for="id_title">Title:</label>
         {{ form.title }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_deadline">Deadline:</label>
+        {{ form.deadline }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_list">Select List:</label>
+        {{ form.list }}
       </div>
 
       <button type="submit">Add</button>

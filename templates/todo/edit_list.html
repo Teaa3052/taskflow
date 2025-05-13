@@ -1,0 +1,18 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Uredi Listu | TaskFlow</title>
+</head>
+<body>
+  <h2>Uredi naziv liste</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Spremi</button>
+  </form>
+  <a href="{% url 'todo_list' %}">← Povratak</a>
+</body>
+</html>
