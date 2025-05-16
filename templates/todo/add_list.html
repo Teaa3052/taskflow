@@ -32,7 +32,7 @@
       border-radius: 14px;
       box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
       width: 90%;
-      max-width: 450px;
+      max-width: 480px;
     }
 
     h2 {
@@ -45,18 +45,18 @@
     form {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 22px;
     }
 
     .form-group label {
       margin-bottom: 6px;
       font-weight: 500;
       color: #444;
+      display: block;
     }
 
     .form-group input[type="text"],
-    .form-group select,
-    .form-group input[type="checkbox"] {
+    .form-group select {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -64,23 +64,38 @@
       width: 100%;
     }
 
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 120px;
+    .checkbox-group-wrapper {
+      background-color: #f1f8ff;
+      border: 1px solid #d0e3ff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      max-height: 160px;
       overflow-y: auto;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 15px;
+      color: #333;
     }
 
     button {
       background-color: #28a745;
       color: white;
       border: none;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 14px;
+      font-size: 17px;
+      font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     button:hover {
@@ -117,9 +132,14 @@
       </div>
 
       <div class="form-group">
-        <label for="id_shared_with">Podijeli s korisnicima:</label>
-        <div class="checkbox-group">
-          {{ form.shared_with }}
+        <label>Podijeli s korisnicima:</label>
+        <div class="checkbox-group-wrapper">
+          {% for checkbox in form.shared_with %}
+            <label class="checkbox-item">
+              {{ checkbox.tag }}
+              <span>{{ checkbox.choice_label }}</span>
+            </label>
+          {% endfor %}
         </div>
       </div>
 

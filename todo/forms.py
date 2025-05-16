@@ -49,3 +49,10 @@ class TodoForm(forms.ModelForm):
             self.fields['list'].queryset = TaskList.objects.filter(
                 Q(user=user) | Q(shared_with=user)
             ).distinct()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        if not title:
+            raise forms.ValidationError("Naslov ne smije biti prazan.")
+        return cleaned_data

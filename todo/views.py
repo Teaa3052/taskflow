@@ -36,7 +36,7 @@ def custom_logout(request):
 @login_required
 def todo_list(request):
     list_id = request.GET.get('list')
-    
+
     task_lists = TaskList.objects.filter(
         Q(user=request.user) | Q(shared_with=request.user)
     ).distinct()
@@ -61,6 +61,7 @@ def todo_list(request):
 
 @login_required
 def add_todo(request):
+    list_id = request.GET.get('list')
     if request.method == 'POST':
         form = TodoForm(request.POST, user=request.user)
         if form.is_valid():
@@ -69,9 +70,7 @@ def add_todo(request):
             if task_list.user == request.user or request.user in task_list.shared_with.all():
                 todo.user = request.user
                 todo.save()
-                return redirect('todo_list')
-            else:
-                return redirect('todo_list')
+                return redirect(f"/?list={task_list.id}")
     else:
         form = TodoForm(user=request.user)
     return render(request, 'todo/add_todo.html', {'form': form})
@@ -79,11 +78,12 @@ def add_todo(request):
 @login_required
 def edit_todo(request, pk):
     todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    list_id = todo.list.id
     if request.method == 'POST':
         form = TodoForm(request.POST, instance=todo, user=request.user)
         if form.is_valid():
             form.save()
-            return redirect('todo_list')
+            return redirect(f"/?list={list_id}")
     else:
         form = TodoForm(instance=todo, user=request.user)
     return render(request, 'todo/edit_todo.html', {'form': form})
@@ -91,16 +91,30 @@ def edit_todo(request, pk):
 @login_required
 def delete_todo(request, pk):
     todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    list_id = todo.list.id
     todo.delete()
-    return redirect('todo_list')
+    return redirect(f"/?list={list_id}")
 
 @require_POST
 @login_required
 def toggle_completed(request, pk):
-    todo = get_object_or_404(Todo, pk=pk, user=request.user)
+    todo = get_object_or_404(Todo, pk=pk)
+
+    # ➤ Samo autor zadatka može označiti kao dovršen
+    if todo.user != request.user:
+        return JsonResponse({
+            'status': 'forbidden',
+            'message': 'Samo autor zadatka može označiti izvršenost.'
+        }, status=403)
+
     todo.completed = not todo.completed
     todo.save()
+
+    list_id = request.GET.get('list')
+    if list_id:
+        return redirect(f"/?list={list_id}")
     return redirect('todo_list')
+
 
 # -------------------------------
 # TASK LIST (KATEGORIJE)
@@ -128,15 +142,21 @@ def edit_list(request, pk):
         form = TaskListForm(request.POST, instance=task_list, user=request.user)
         if form.is_valid():
             form.save()
-        return redirect('todo_list')
+        return redirect(f"/?list={task_list.id}")
     else:
-        # Ako želiš edit modal preko AJAX-a, ovo bi trebao biti JSON, ali za sada se koristi samo POST
         return redirect('todo_list')
 
 @require_http_methods(["POST"])
 @csrf_protect
 @login_required
 def delete_list(request, list_id):
-    task_list = get_object_or_404(TaskList, id=list_id, user=request.user)
+    task_list = get_object_or_404(TaskList, id=list_id)
+
+    if task_list.user != request.user:
+        return JsonResponse({
+            'status': 'forbidden',
+            'message': 'Ne možeš obrisati ovu listu jer nisi njezin vlasnik.'
+        }, status=403)
+
     task_list.delete()
     return JsonResponse({'status': 'ok'})
